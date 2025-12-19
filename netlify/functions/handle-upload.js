@@ -1,5 +1,5 @@
 // Netlify Serverless Function - 处理表单提交
-const fetch = require('node-fetch')
+// Note: Using native fetch available in Node 18+
 
 exports.handler = async function(event, context) {
   // 只允许POST请求
