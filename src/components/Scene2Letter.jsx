@@ -1,0 +1,322 @@
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import FlipBook from './FlipBook'
+
+// 这是您可以后续轻松修改的书信内容配置
+const letterContent = {
+  title: "致我最爱的你",
+  date: "2024年2月14日",
+  paragraphs: [
+    "亲爱的宝贝，",
+    "当我提笔写下这些文字时，心中涌动着千言万语，却一时不知从何说起。就像夜空中最亮的星，你的出现照亮了我生命的每一个角落。",
+    "还记得我们初次相遇的情景吗？那一刻，时间仿佛静止，世界只剩下你明媚的笑容。从那时起，我知道，我的故事里不能没有你。",
+    "与你相处的每一天，都像是童话般美好。你的笑声是我最爱的音乐，你的眼眸是我最沉醉的星辰，你的温柔是我最眷恋的港湾。",
+    "我想和你一起看遍四季轮回：春天赏花，夏天听雨，秋天漫步，冬天看雪。想和你分享生活的点点滴滴，无论是平凡的日常还是特别的时刻。",
+    "你是我清晨醒来第一个想到的人，也是夜晚入睡前最后的思念。你的存在，让我的世界充满了色彩和意义。",
+    "我不敢说能给你全世界，但我能保证，我的全世界都会给你。我会用尽全力守护你的笑容，珍惜我们之间的每一份感动。",
+    "今天，我想大声告诉你：我爱你，不仅因为你的样子，更因为和你在一起时，我的样子。",
+    "未来的路，让我们一起走下去，好吗？",
+  ],
+  closing: "永远爱你的",
+  signature: "[你的名字]",
+  ps: "P.S. 你愿意让我们的故事继续书写下去吗？"
+}
+
+// 您可以在这里添加装饰图片的位置和配置
+const decorationSpots = [
+  { id: 1, top: "10%", left: "5%", size: "w-16 h-16", content: "💖" },
+  { id: 2, top: "15%", right: "8%", size: "w-20 h-20", content: "✨" },
+  { id: 3, bottom: "20%", left: "10%", size: "w-12 h-12", content: "🌟" },
+  { id: 4, bottom: "30%", right: "15%", size: "w-24 h-24", content: "🌸" },
+  // 您可以继续添加更多装饰位置
+  // { id: 5, top: "50%", left: "50%", size: "w-32 h-32", content: "🦋" },
+]
+
+const Scene2Letter = ({ onContinue }) => {
+  const [showLetter, setShowLetter] = useState(false)
+  const [currentParagraph, setCurrentParagraph] = useState(0)
+  const [flipCompleted, setFlipCompleted] = useState(false)
+  const [floatingHearts, setFloatingHearts] = useState([])
+  const sceneRef = useRef(null)
+  
+  useEffect(() => {
+    // 页面加载后开始展示动画
+    const timer = setTimeout(() => {
+      setShowLetter(true)
+      startTypewriterEffect()
+    }, 1000)
+    
+    // 创建飘动的小爱心
+    const heartInterval = setInterval(() => {
+      if (floatingHearts.length < 15) {
+        const newHeart = {
+          id: Date.now(),
+          left: Math.random() * 100,
+          size: Math.random() * 20 + 10,
+          duration: Math.random() * 3 + 2
+        }
+        setFloatingHearts(prev => [...prev, newHeart])
+      }
+    }, 800)
+    
+    // 移除爱心
+    const cleanupInterval = setInterval(() => {
+      setFloatingHearts(prev => {
+        if (prev.length > 10) {
+          return prev.slice(1)
+        }
+        return prev
+      })
+    }, 2000)
+    
+    return () => {
+      clearTimeout(timer)
+      clearInterval(heartInterval)
+      clearInterval(cleanupInterval)
+    }
+  }, [floatingHearts.length])
+  
+  const startTypewriterEffect = () => {
+    let paragraphIndex = 0
+    const typeInterval = setInterval(() => {
+      if (paragraphIndex < letterContent.paragraphs.length) {
+        setCurrentParagraph(paragraphIndex + 1)
+        paragraphIndex++
+      } else {
+        clearInterval(typeInterval)
+      }
+    }, 800)
+  }
+  
+  const handleFlipComplete = () => {
+    setFlipCompleted(true)
+  }
+  
+  const handleContinue = () => {
+    onContinue()
+  }
+
+  return (
+    <div 
+      ref={sceneRef}
+      className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 relative overflow-hidden"
+    >
+      {/* 背景装饰元素 */}
+      <div className="absolute inset-0 paper-texture opacity-20"></div>
+      
+      {/* 飘动的爱心 */}
+      {floatingHearts.map(heart => (
+        <motion.div
+          key={heart.id}
+          className="absolute text-pink-300"
+          style={{
+            left: `${heart.left}%`,
+            top: '110%',
+            fontSize: `${heart.size}px`
+          }}
+          animate={{
+            y: [-20, -window.innerHeight],
+            x: [0, Math.sin(heart.id) * 50],
+            rotate: [0, 360],
+            opacity: [1, 0]
+          }}
+          transition={{
+            duration: heart.duration,
+            ease: "linear"
+          }}
+          onAnimationComplete={() => {
+            setFloatingHearts(prev => prev.filter(h => h.id !== heart.id))
+          }}
+        >
+          ❤️
+        </motion.div>
+      ))}
+      
+      {/* 闪烁的星星 */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute text-yellow-200"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            fontSize: `${Math.random() * 10 + 8}px`
+          }}
+          animate={{
+            opacity: [0.3, 1, 0.3],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{
+            duration: Math.random() * 2 + 1,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          ✨
+        </motion.div>
+      ))}
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl md:text-7xl font-elegant text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4">
+            爱的告白书
+          </h1>
+          <p className="text-xl text-gray-600">
+            翻开这本书，里面有我想对你说的一切...
+          </p>
+        </motion.div>
+        
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
+          {/* 3D翻页书本 */}
+          <div className="lg:w-1/2">
+            <FlipBook onFlipComplete={handleFlipComplete} />
+          </div>
+          
+          {/* 书信内容展示区 */}
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: showLetter ? 1 : 0, x: showLetter ? 0 : 50 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="lg:w-1/2 max-w-2xl"
+          >
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border-8 border-pink-100 relative overflow-hidden">
+              {/* 信纸纹理 */}
+              <div className="absolute inset-0 paper-texture opacity-10"></div>
+              
+              {/* 装饰元素 - 这些位置您可以后续替换为图片 */}
+              {decorationSpots.map(spot => (
+                <div
+                  key={spot.id}
+                  className={`absolute ${spot.size} flex items-center justify-center animate-float`}
+                  style={{
+                    top: spot.top,
+                    left: spot.left,
+                    right: spot.right,
+                    bottom: spot.bottom,
+                    animationDelay: `${spot.id * 0.5}s`
+                  }}
+                >
+                  <div className="text-4xl animate-spin-slow">
+                    {spot.content}
+                  </div>
+                </div>
+              ))}
+              
+              {/* 书信内容 */}
+              <div className="relative z-10">
+                <div className="text-center mb-8">
+                  <h2 className="text-4xl font-handwriting text-pink-600 mb-2">
+                    {letterContent.title}
+                  </h2>
+                  <p className="text-gray-500 italic">{letterContent.date}</p>
+                </div>
+                
+                <div className="h-1 bg-gradient-to-r from-pink-200 via-purple-200 to-pink-200 mb-8"></div>
+                
+                <div className="space-y-6 text-gray-700 text-lg leading-relaxed font-elegant">
+                  {letterContent.paragraphs.slice(0, currentParagraph).map((para, index) => (
+                    <motion.p
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="text-xl"
+                    >
+                      {para}
+                    </motion.p>
+                  ))}
+                  
+                  {currentParagraph >= letterContent.paragraphs.length && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                        className="mt-12 text-right"
+                      >
+                        <p className="text-2xl font-handwriting text-pink-600 mb-2">
+                          {letterContent.closing}
+                        </p>
+                        <p className="text-3xl font-handwriting text-purple-600 border-b-2 border-purple-300 pb-2 inline-block">
+                          {letterContent.signature}
+                        </p>
+                      </motion.div>
+                      
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1, delay: 1 }}
+                        className="mt-8 text-center text-gray-600 italic text-lg"
+                      >
+                        {letterContent.ps}
+                      </motion.p>
+                    </>
+                  )}
+                </div>
+                
+                {/* 装饰分隔线 */}
+                <div className="flex items-center justify-center my-12">
+                  <div className="h-px bg-gradient-to-r from-transparent via-pink-300 to-transparent flex-grow"></div>
+                  <div className="mx-4 text-2xl animate-bounce-slow">💌</div>
+                  <div className="h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent flex-grow"></div>
+                </div>
+                
+                {/* 继续按钮 */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ 
+                    opacity: flipCompleted ? 1 : 0, 
+                    scale: flipCompleted ? 1 : 0.8 
+                  }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center"
+                >
+                  <p className="text-gray-600 mb-6 text-xl">
+                    你也想表达爱意吗？点击此处向他传递你的心愿！
+                  </p>
+                  <button
+                    onClick={handleContinue}
+                    className="btn-romantic text-2xl px-12 py-6 group"
+                  >
+                    <span className="flex items-center justify-center gap-3">
+                      传递我的心意
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="group-hover:translate-x-2 transition-transform"
+                      >
+                        →
+                      </motion.span>
+                    </span>
+                  </button>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* 页脚说明 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="text-center mt-12 text-gray-500"
+        >
+          <p className="text-lg">
+            💝 此页面所有装饰元素均可替换为您喜欢的图片 💝
+          </p>
+          <p className="mt-2">
+            只需在 <code className="bg-pink-100 px-2 py-1 rounded">decorationSpots</code> 数组中替换content为图片URL
+          </p>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+export default Scene2Letter
