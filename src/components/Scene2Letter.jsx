@@ -41,6 +41,7 @@ const Scene2Letter = ({ onContinue }) => {
   const [showLetter, setShowLetter] = useState(false)
   const [currentParagraph, setCurrentParagraph] = useState(0)
   const [flipCompleted, setFlipCompleted] = useState(false)
+  const [showFullLetter, setShowFullLetter] = useState(false)
   const [floatingHearts, setFloatingHearts] = useState([])
   const sceneRef = useRef(null)
   
@@ -95,6 +96,10 @@ const Scene2Letter = ({ onContinue }) => {
   
   const handleFlipComplete = () => {
     setFlipCompleted(true)
+    // 翻书完成后，延迟显示全屏文书
+    setTimeout(() => {
+      setShowFullLetter(true)
+    }, 500)
   }
   
   const handleContinue = () => {
@@ -161,165 +166,177 @@ const Scene2Letter = ({ onContinue }) => {
         </motion.div>
       ))}
       
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-5xl md:text-7xl font-elegant text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4">
-            爱的告白书
-          </h1>
-          <p className="text-xl text-gray-600">
-            翻开这本书，里面有我想对你说的一切...
-          </p>
-        </motion.div>
-        
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
-          {/* 3D翻页书本 */}
-          <div className="lg:w-1/2">
-            <FlipBook onFlipComplete={handleFlipComplete} />
-          </div>
-          
-          {/* 书信内容展示区 */}
-          <motion.div 
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: showLetter ? 1 : 0, x: showLetter ? 0 : 50 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="lg:w-1/2 max-w-2xl"
+      {/* 初始状态：显示标题和书本 */}
+      {!showFullLetter && (
+        <div className="container mx-auto px-4 py-12 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
           >
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border-8 border-pink-100 relative overflow-hidden">
-              {/* 信纸纹理 */}
-              <div className="absolute inset-0 paper-texture opacity-10"></div>
+            <h1 className="text-5xl md:text-7xl font-elegant text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4">
+              爱的告白书
+            </h1>
+            <p className="text-xl text-gray-600">
+              翻开这本书，里面有我想对你说的一切...
+            </p>
+          </motion.div>
+          
+          <div className="flex justify-center">
+            {/* 3D翻页书本 */}
+            <div className="w-full max-w-2xl">
+              <FlipBook onFlipComplete={handleFlipComplete} />
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 全屏文书显示 */}
+      {showFullLetter && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="min-h-screen flex items-center justify-center p-4 md:p-8 relative z-10"
+        >
+          <div className="w-full max-w-5xl bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-16 border-8 border-pink-100 relative overflow-hidden">
+            {/* 信纸纹理 */}
+            <div className="absolute inset-0 paper-texture opacity-10"></div>
+            
+            {/* 图片位置 - 顶部 */}
+            <div className="relative z-10 mb-8">
+              <img 
+                src="/images/3.jpg" 
+                alt="顶部图片" 
+                className="w-full h-64 object-cover rounded-2xl shadow-lg"
+              />
+            </div>
+            
+            {/* 书信内容 */}
+            <div className="relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl md:text-5xl font-handwriting text-pink-600 mb-2">
+                  {letterContent.title}
+                </h2>
+                <p className="text-gray-500 italic text-lg">{letterContent.date}</p>
+              </div>
               
-              {/* 装饰元素 - 这些位置您可以后续替换为图片 */}
-              {decorationSpots.map(spot => (
-                <div
-                  key={spot.id}
-                  className={`absolute ${spot.size} flex items-center justify-center animate-float`}
-                  style={{
-                    top: spot.top,
-                    left: spot.left,
-                    right: spot.right,
-                    bottom: spot.bottom,
-                    animationDelay: `${spot.id * 0.5}s`
-                  }}
-                >
-                  <div className="text-4xl animate-spin-slow">
-                    {spot.content}
+              <div className="h-1 bg-gradient-to-r from-pink-200 via-purple-200 to-pink-200 mb-8"></div>
+              
+              {/* 文书内容区域 */}
+              <div className="space-y-8 mb-8">
+                {/* 第一段文字 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-1">
+                    <div className="sticky top-4">
+                      <img 
+                        src="/images/1.jpg" 
+                        alt="左侧图片" 
+                        className="w-full h-64 object-cover rounded-xl shadow-lg"
+                      />
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="space-y-6 text-gray-700 text-lg md:text-xl leading-relaxed font-elegant">
+                      {letterContent.paragraphs.slice(0, Math.ceil(letterContent.paragraphs.length / 2)).map((para, index) => (
+                        <motion.p
+                          key={index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
+                          {para}
+                        </motion.p>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
+                
+                {/* 第二段文字 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <div className="space-y-6 text-gray-700 text-lg md:text-xl leading-relaxed font-elegant">
+                      {letterContent.paragraphs.slice(Math.ceil(letterContent.paragraphs.length / 2)).map((para, index) => (
+                        <motion.p
+                          key={index + Math.ceil(letterContent.paragraphs.length / 2)}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: (index + Math.ceil(letterContent.paragraphs.length / 2)) * 0.1 }}
+                        >
+                          {para}
+                        </motion.p>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="md:col-span-1">
+                    <div className="sticky top-4">
+                      <img 
+                        src="/images/2.jpg" 
+                        alt="右侧图片" 
+                        className="w-full h-64 object-cover rounded-xl shadow-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
               
-              {/* 书信内容 */}
-              <div className="relative z-10">
-                <div className="text-center mb-8">
-                  <h2 className="text-4xl font-handwriting text-pink-600 mb-2">
-                    {letterContent.title}
-                  </h2>
-                  <p className="text-gray-500 italic">{letterContent.date}</p>
-                </div>
-                
-                <div className="h-1 bg-gradient-to-r from-pink-200 via-purple-200 to-pink-200 mb-8"></div>
-                
-                <div className="space-y-6 text-gray-700 text-lg leading-relaxed font-elegant">
-                  {letterContent.paragraphs.slice(0, currentParagraph).map((para, index) => (
-                    <motion.p
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="text-xl"
-                    >
-                      {para}
-                    </motion.p>
-                  ))}
-                  
-                  {currentParagraph >= letterContent.paragraphs.length && (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                        className="mt-12 text-right"
-                      >
-                        <p className="text-2xl font-handwriting text-pink-600 mb-2">
-                          {letterContent.closing}
-                        </p>
-                        <p className="text-3xl font-handwriting text-purple-600 border-b-2 border-purple-300 pb-2 inline-block">
-                          {letterContent.signature}
-                        </p>
-                      </motion.div>
-                      
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1, delay: 1 }}
-                        className="mt-8 text-center text-gray-600 italic text-lg"
-                      >
-                        {letterContent.ps}
-                      </motion.p>
-                    </>
-                  )}
-                </div>
-                
-                {/* 装饰分隔线 */}
-                <div className="flex items-center justify-center my-12">
-                  <div className="h-px bg-gradient-to-r from-transparent via-pink-300 to-transparent flex-grow"></div>
-                  <div className="mx-4 text-2xl animate-bounce-slow">💌</div>
-                  <div className="h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent flex-grow"></div>
-                </div>
-                
-                {/* 继续按钮 */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ 
-                    opacity: flipCompleted ? 1 : 0, 
-                    scale: flipCompleted ? 1 : 0.8 
-                  }}
-                  transition={{ duration: 0.5 }}
-                  className="text-center"
+              {/* 签名部分 */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="mt-12 text-right"
+              >
+                <p className="text-2xl md:text-3xl font-handwriting text-pink-600 mb-2">
+                  {letterContent.closing}
+                </p>
+                <p className="text-3xl md:text-4xl font-handwriting text-purple-600 border-b-2 border-purple-300 pb-2 inline-block">
+                  {letterContent.signature}
+                </p>
+              </motion.div>
+              
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="mt-8 text-center text-gray-600 italic text-lg md:text-xl"
+              >
+                {letterContent.ps}
+              </motion.p>
+              
+              {/* 装饰分隔线 */}
+              <div className="flex items-center justify-center my-12">
+                <div className="h-px bg-gradient-to-r from-transparent via-pink-300 to-transparent flex-grow"></div>
+                <div className="mx-4 text-2xl animate-bounce-slow">💌</div>
+                <div className="h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent flex-grow"></div>
+              </div>
+              
+              {/* 继续按钮 */}
+              <div className="text-center">
+                <p className="text-gray-600 mb-6 text-xl md:text-2xl">
+                  你也想表达爱意吗？点击此处向他传递你的心愿！
+                </p>
+                <button
+                  onClick={handleContinue}
+                  className="btn-romantic text-2xl px-12 py-6 group"
                 >
-                  <p className="text-gray-600 mb-6 text-xl">
-                    你也想表达爱意吗？点击此处向他传递你的心愿！
-                  </p>
-                  <button
-                    onClick={handleContinue}
-                    className="btn-romantic text-2xl px-12 py-6 group"
-                  >
-                    <span className="flex items-center justify-center gap-3">
-                      传递我的心意
-                      <motion.span
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="group-hover:translate-x-2 transition-transform"
-                      >
-                        →
-                      </motion.span>
-                    </span>
-                  </button>
-                </motion.div>
+                  <span className="flex items-center justify-center gap-3">
+                    传递我的心意
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.5 }}
+                      className="group-hover:translate-x-2 transition-transform"
+                    >
+                      →
+                    </motion.span>
+                  </span>
+                </button>
               </div>
             </div>
-          </motion.div>
-        </div>
-        
-        {/* 页脚说明 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 2 }}
-          className="text-center mt-12 text-gray-500"
-        >
-          <p className="text-lg">
-            💝 此页面所有装饰元素均可替换为您喜欢的图片 💝
-          </p>
-          <p className="mt-2">
-            只需在 <code className="bg-pink-100 px-2 py-1 rounded">decorationSpots</code> 数组中替换content为图片URL
-          </p>
+          </div>
         </motion.div>
-      </div>
+      )}
     </div>
   )
 }

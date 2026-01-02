@@ -173,13 +173,13 @@ const Scene3Upload = ({ onSuccess, onBack }) => {
           </p>
         </motion.div>
         
-        <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
+        <div className="flex justify-center max-w-4xl mx-auto">
           {/* 上传表单 */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="lg:w-1/2"
+            className="w-full"
           >
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border-8 border-purple-100">
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -343,78 +343,6 @@ const Scene3Upload = ({ onSuccess, onBack }) => {
                   </button>
                 </div>
               </form>
-            </div>
-          </motion.div>
-          
-          {/* 说明和信息面板 */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:w-1/2"
-          >
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl shadow-2xl p-8 text-white h-full">
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-3xl font-bold mb-4">💌 祝福会去哪里？</h3>
-                  <p className="text-lg leading-relaxed">
-                    你提交的每一条祝福都会：
-                  </p>
-                  <ul className="space-y-3 mt-4 text-lg">
-                    <li className="flex items-start gap-3">
-                      <span className="text-2xl">📧</span>
-                      <span>立即发送到主人的邮箱：1341628298@qq.com</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="text-2xl">💾</span>
-                      <span>安全存储在网站数据库中</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="text-2xl">🔔</span>
-                      <span>主人会收到实时通知</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="bg-white/20 rounded-2xl p-6">
-                  <h4 className="text-2xl font-bold mb-4">🎁 温馨提示</h4>
-                  <ul className="space-y-3">
-                    <li>• 祝福语建议50-200字，表达更真挚</li>
-                    <li>• 可以上传你们的合照或象征物</li>
-                    <li>• 匿名祝福也会被真诚对待</li>
-                    <li>• 所有内容都会经过审核</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="text-2xl font-bold mb-4">📊 近期祝福统计</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/20 rounded-xl p-4 text-center">
-                      <div className="text-3xl font-bold">128</div>
-                      <div className="text-sm">累计祝福</div>
-                    </div>
-                    <div className="bg-white/20 rounded-xl p-4 text-center">
-                      <div className="text-3xl font-bold">89</div>
-                      <div className="text-sm">带图祝福</div>
-                    </div>
-                    <div className="bg-white/20 rounded-xl p-4 text-center">
-                      <div className="text-3xl font-bold">24</div>
-                      <div className="text-sm">今日新增</div>
-                    </div>
-                    <div className="bg-white/20 rounded-xl p-4 text-center">
-                      <div className="text-3xl font-bold">100%</div>
-                      <div className="text-sm">回复率</div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* 管理员入口提示 */}
-                <div className="mt-8 p-4 bg-white/10 rounded-xl border-2 border-white/30">
-                  <p className="text-center text-sm">
-                    管理员入口：在URL后添加 <code className="bg-white/20 px-2 py-1 rounded">?admin=true</code>
-                  </p>
-                </div>
-              </div>
             </div>
           </motion.div>
         </div>
