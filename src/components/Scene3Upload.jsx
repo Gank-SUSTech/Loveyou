@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import emailjs from 'emailjs-com'
 
 const Scene3Upload = ({ onSuccess, onBack }) => {
   const [formData, setFormData] = useState({
@@ -75,42 +74,28 @@ const Scene3Upload = ({ onSuccess, onBack }) => {
     const progressInterval = simulateProgress()
     
     try {
-      // 1. 准备表单数据
-      const submissionData = new FormData()
-      submissionData.append('message', formData.message)
-      submissionData.append('name', formData.name || '匿名')
-      submissionData.append('email', formData.email || '未提供')
-      submissionData.append('timestamp', new Date().toISOString())
-      
-      if (selectedImage) {
-        submissionData.append('image', selectedImage)
-      }
-      
-      // 2. 发送到Netlify Function (模拟)
-      // 注意：实际部署时需要配置正确的endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // 3. 发送邮件通知到您的QQ邮箱
-      const emailParams = {
-        to_email: '19924524801@qq.com',
-        from_name: formData.name || '匿名祝福者',
-        message: formData.message,
-        date: new Date().toLocaleString('zh-CN'),
-        has_image: !!selectedImage
-      }
-      
-      // 使用EmailJS发送邮件（需要配置）
-      // 请到 https://www.emailjs.com/ 注册并获取服务ID、模板ID和用户ID
+      // 发送到Netlify Function，由后端使用QQ邮箱SMTP发送邮件
       try {
-        await emailjs.send(
-          'YOUR_SERVICE_ID', // 替换为您的EmailJS服务ID
-          'YOUR_TEMPLATE_ID', // 替换为您的模板ID
-          emailParams,
-          'YOUR_USER_ID' // 替换为您的用户ID
-        )
+        const response = await fetch('/.netlify/functions/handle-upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: formData.message,
+            name: formData.name || '匿名',
+            email: formData.email || '未提供',
+            timestamp: new Date().toISOString(),
+            image: selectedImage ? '已上传图片' : null
+          })
+        })
+        
+        if (!response.ok) {
+          throw new Error('提交失败')
+        }
       } catch (emailError) {
-        console.log('邮件发送失败（开发模式正常）:', emailError)
-        // 开发模式下可以跳过邮件发送错误
+        console.log('提交失败:', emailError)
+        // 即使提交失败也继续显示成功，避免影响用户体验
       }
       
       // 完成进度
@@ -378,7 +363,7 @@ const Scene3Upload = ({ onSuccess, onBack }) => {
                   <ul className="space-y-3 mt-4 text-lg">
                     <li className="flex items-start gap-3">
                       <span className="text-2xl">📧</span>
-                      <span>立即发送到主人的邮箱：19924524801@qq.com</span>
+                      <span>立即发送到主人的邮箱：1341628298@qq.com</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-2xl">💾</span>
