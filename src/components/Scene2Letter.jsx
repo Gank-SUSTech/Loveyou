@@ -96,10 +96,8 @@ const Scene2Letter = ({ onContinue }) => {
   
   const handleFlipComplete = () => {
     setFlipCompleted(true)
-    // 翻书完成后，延迟显示全屏文书
-    setTimeout(() => {
-      setShowFullLetter(true)
-    }, 500)
+    // 立即显示全屏文书，无延迟
+    setShowFullLetter(true)
   }
   
   const handleContinue = () => {

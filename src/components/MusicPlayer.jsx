@@ -3,10 +3,13 @@ import { motion } from 'framer-motion'
 import { Howl } from 'howler'
 
 // 音乐文件配置 - 请将音乐文件放入 public/music/ 目录
+// 三个场景共用同一个背景音乐
+const backgroundMusic = '/music/bg.mp3'
+
 const sceneMusic = {
-  1: '/music/scene1-bg.mp3', // 紧张/戏剧性的音乐
-  2: '/music/scene2-bg.mp3', // 浪漫/迪士尼风格音乐
-  3: '/music/scene3-bg.mp3', // 温馨/感性的音乐
+  1: backgroundMusic, // 统一背景音乐
+  2: backgroundMusic, // 统一背景音乐
+  3: backgroundMusic, // 统一背景音乐
 }
 
 const MusicPlayer = ({ scene, enabled, onToggle }) => {
@@ -16,36 +19,33 @@ const MusicPlayer = ({ scene, enabled, onToggle }) => {
   const soundRef = useRef(null)
 
   useEffect(() => {
-    // 初始化或切换音乐
+    // 初始化音乐（三个场景共用同一个音乐文件）
     if (enabled && sceneMusic[scene]) {
-      // 停止当前播放的音乐
-      if (soundRef.current) {
-        soundRef.current.stop()
+      const newTrack = sceneMusic[scene]
+      
+      // 如果还没有加载音乐，创建Howl实例
+      if (!soundRef.current) {
+        soundRef.current = new Howl({
+          src: [newTrack],
+          volume: volume,
+          loop: true,
+          autoplay: isPlaying,
+          onload: () => {
+            console.log(`背景音乐加载完成`)
+          },
+          onplayerror: () => {
+            // 如果音乐文件不存在，静默处理
+            console.log(`背景音乐文件未找到，请将音乐文件放入 public/music/bg.mp3`)
+          }
+        })
+
+        setCurrentTrack(newTrack)
       }
-
-      // 创建新的Howl实例
-      soundRef.current = new Howl({
-        src: [sceneMusic[scene]],
-        volume: volume,
-        loop: true,
-        autoplay: isPlaying,
-        onload: () => {
-          console.log(`场景 ${scene} 音乐加载完成`)
-        },
-        onplayerror: () => {
-          // 如果音乐文件不存在，静默处理
-          console.log(`场景 ${scene} 音乐文件未找到，使用默认提示`)
-        }
-      })
-
-      setCurrentTrack(sceneMusic[scene])
+      // 如果音乐已加载，切换场景时不重新加载（因为使用同一个文件）
     }
 
     return () => {
-      // 清理
-      if (soundRef.current) {
-        soundRef.current.stop()
-      }
+      // 组件卸载时才清理，切换场景时不清理
     }
   }, [scene, enabled])
 
@@ -113,12 +113,9 @@ const MusicPlayer = ({ scene, enabled, onToggle }) => {
             {isPlaying ? '🎵' : '🎶'}
           </div>
           <div>
-            <h3 className="font-bold text-gray-800">场景背景音乐</h3>
+            <h3 className="font-bold text-gray-800">背景音乐</h3>
             <p className="text-sm text-gray-600">
-              当前：场景 {scene} {
-                scene === 1 ? '(警告主题)' : 
-                scene === 2 ? '(浪漫主题)' : '(互动主题)'
-              }
+              当前：场景 {scene} - 统一背景音乐
             </p>
           </div>
         </div>

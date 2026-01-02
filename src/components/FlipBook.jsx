@@ -26,12 +26,14 @@ const FlipBook = ({ onFlipComplete }) => {
     if (!isFlipping && !isFlipped) {
       setIsFlipping(true)
       
-      // 翻页动画完成后
+      // 立即触发回调，让全屏文书快速显示
+      if (onFlipComplete) onFlipComplete()
+      
+      // 快速完成动画
       setTimeout(() => {
         setIsFlipping(false)
         setIsFlipped(true)
-        if (onFlipComplete) onFlipComplete()
-      }, 1500)
+      }, 600)
     }
   }
   
@@ -45,7 +47,7 @@ const FlipBook = ({ onFlipComplete }) => {
       <motion.div
         initial={{ rotateY: 0 }}
         animate={{ rotateY: isFlipping ? -180 : 0 }}
-        transition={{ duration: 1.5, ease: "easeInOut" }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
         className={`relative w-full h-96 perspective-1000 ${showBook ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       >
         {/* 书本正面 */}
