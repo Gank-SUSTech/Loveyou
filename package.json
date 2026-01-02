@@ -14,7 +14,8 @@
     "framer-motion": "^10.16.4",
     "howler": "^2.2.4",
     "emailjs-com": "^3.2.0",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
